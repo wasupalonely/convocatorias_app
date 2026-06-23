@@ -1,0 +1,20 @@
+# Entorno
+.env
+
+# Backend (Java / Maven)
+backend/target/
+*.class
+
+# Frontend (Node / Angular)
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Sistema
+.DS_Store
+Thumbs.db

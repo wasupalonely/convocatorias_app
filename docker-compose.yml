@@ -1,0 +1,56 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: convocatorias-db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:-Surcolombiana2026*}
+      MSSQL_PID: Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/1433' 2>/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 25s
+
+  # Crea la base de datos 'convocatorias_db' una sola vez (SQL Server no la crea solo).
+  db-init:
+    image: mcr.microsoft.com/mssql-tools:latest
+    container_name: convocatorias-db-init
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD:-Surcolombiana2026*}
+    entrypoint: >
+      bash -c '
+      for i in $(seq 1 30); do
+        /opt/mssql-tools/bin/sqlcmd -S db -U sa -P "$$DB_PASSWORD" -Q "IF DB_ID('"'"'convocatorias_db'"'"') IS NULL CREATE DATABASE convocatorias_db" && exit 0;
+        echo "Esperando a SQL Server... ($$i)"; sleep 3;
+      done;
+      echo "No fue posible conectar a SQL Server"; exit 1'
+    restart: "no"
+
+  backend:
+    build: ./backend
+    container_name: convocatorias-backend
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      DB_HOST: db
+      DB_PORT: "1433"
+      DB_NAME: convocatorias_db
+      DB_USER: sa
+      DB_PASSWORD: ${DB_PASSWORD:-Surcolombiana2026*}
+      JWT_SECRET: ${JWT_SECRET:-Y29udm9jYXRvcmlhcy11c2NvLXNlY3JldC1rZXktMzJieXRlcy1taW5pbXVt}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:4200}
+    ports:
+      - "8080:8080"
+
+volumes:
+  mssql-data:

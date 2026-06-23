@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: convocatorias
+
+  datasource:
+    url: jdbc:sqlserver://${DB_HOST:localhost}:${DB_PORT:1433};databaseName=${DB_NAME:convocatorias_db};encrypt=true;trustServerCertificate=true
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:Surcolombiana2026*}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+        format_sql: false
+    show-sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:Y29udm9jYXRvcmlhcy11c2NvLXNlY3JldC1rZXktMzJieXRlcy1taW5pbXVt}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+  seed:
+    admin-identificacion: ${SEED_ADMIN_ID:1000000000}
+    admin-nombre: ${SEED_ADMIN_NOMBRE:Administrador USCO}
+    admin-correo: ${SEED_ADMIN_CORREO:admin@usco.edu.co}
+    admin-password: ${SEED_ADMIN_PASSWORD:Admin123*}
+    enabled: ${SEED_ENABLED:true}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    org.flywaydb: info
