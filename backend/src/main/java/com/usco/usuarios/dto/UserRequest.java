@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-/** Data to create a user. */
 public record UserRequest(
         @NotBlank(message = "La identificacion es obligatoria")
         @Size(max = 30, message = "La identificacion no puede exceder 30 caracteres")

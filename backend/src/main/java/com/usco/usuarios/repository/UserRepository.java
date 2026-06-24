@@ -21,10 +21,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     long countByRoleAndStatus(Role role, UserStatus status);
 
-    /**
-     * Number of applications submitted by the user. A native count over the applications table
-     * keeps this module decoupled from the postulaciones module.
-     */
     @Query(value = "SELECT COUNT(*) FROM postulaciones WHERE postulante_id = :userId",
             nativeQuery = true)
     long countApplicationsByUser(@Param("userId") Long userId);

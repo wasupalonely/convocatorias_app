@@ -11,10 +11,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-/**
- * Creates the initial ADMINISTRADOR user if none exists yet, so the system is
- * operable after the first startup without exposing a password hash in the SQL script.
- */
 @Component
 public class DataInitializer implements CommandLineRunner {
 

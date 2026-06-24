@@ -16,7 +16,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.util.HashMap;
 import java.util.Map;
 
-/** Translates application-wide exceptions into consistent {@link ApiError} responses. */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

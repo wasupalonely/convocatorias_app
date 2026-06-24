@@ -15,7 +15,6 @@ import lombok.Setter;
 
 import java.time.Instant;
 
-/** A system user (administrator, teacher or student). Mapped to the Spanish table {@code usuarios}. */
 @Entity
 @Table(name = "usuarios")
 @Getter

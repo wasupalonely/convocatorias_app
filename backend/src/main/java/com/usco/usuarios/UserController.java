@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 import java.util.List;
 
-/** User management. Authorization (ADMINISTRADOR only) is enforced centrally in SecurityConfig. */
 @RestController
 @RequestMapping("/api/usuarios")
 public class UserController {

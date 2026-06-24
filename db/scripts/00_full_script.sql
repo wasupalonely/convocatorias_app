@@ -1,17 +1,3 @@
-/* =====================================================================
-   Universidad Surcolombiana
-   Sistema de Gestion de Convocatorias Institucionales
-   Script SQL completo (SQL Server / T-SQL)
-   ---------------------------------------------------------------------
-   Contenido:
-     1. Creacion de base de datos
-     2. Esquema (tablas, claves, integridad referencial, normalizacion)
-     3. Datos semilla de ejemplo (categorias)
-   Nota: los usuarios semilla (incluido el ADMINISTRADOR) se crean desde
-         la aplicacion para almacenar la contrasena con hash BCrypt.
-   ===================================================================== */
-
--------------------------------------------------------------------------
 -- 1. Base de datos
 -------------------------------------------------------------------------
 IF DB_ID('convocatorias_db') IS NULL
@@ -23,11 +9,6 @@ GO
 USE convocatorias_db;
 GO
 
--------------------------------------------------------------------------
--- 2. Esquema
--------------------------------------------------------------------------
-
--- Usuarios -------------------------------------------------------------
 IF OBJECT_ID('dbo.usuarios', 'U') IS NULL
 BEGIN
     CREATE TABLE dbo.usuarios (
@@ -84,17 +65,19 @@ BEGIN
 END
 GO
 
--- Relacion N:M Convocatoria <-> Categoria ------------------------------
+-- Relacion N:M Convocatoria Categoria ------------------------------
 IF OBJECT_ID('dbo.convocatoria_categoria', 'U') IS NULL
 BEGIN
     CREATE TABLE dbo.convocatoria_categoria (
         convocatoria_id BIGINT NOT NULL,
         categoria_id    BIGINT NOT NULL,
         CONSTRAINT PK_conv_cat PRIMARY KEY (convocatoria_id, categoria_id),
+        -- Cascade del lado de la convocatoria: borrar una convocatoria limpia sus asociaciones.
         CONSTRAINT FK_conv_cat_convocatoria FOREIGN KEY (convocatoria_id)
             REFERENCES dbo.convocatorias (id) ON DELETE CASCADE,
+        -- RESTRICT del lado de la categoria: no se puede borrar una categoria en uso.
         CONSTRAINT FK_conv_cat_categoria FOREIGN KEY (categoria_id)
-            REFERENCES dbo.categorias (id) ON DELETE CASCADE
+            REFERENCES dbo.categorias (id)
     );
     CREATE INDEX IX_conv_cat_categoria ON dbo.convocatoria_categoria (categoria_id);
 END
@@ -106,7 +89,7 @@ BEGIN
     CREATE TABLE dbo.postulaciones (
         id                 BIGINT IDENTITY(1,1)    NOT NULL,
         convocatoria_id    BIGINT                  NOT NULL,
-        estudiante_id      BIGINT                  NOT NULL,
+        postulante_id      BIGINT                  NOT NULL,
         estado             VARCHAR(12)             NOT NULL CONSTRAINT DF_post_estado DEFAULT 'PENDIENTE',
         observacion        NVARCHAR(500)           NULL,
         fecha_postulacion  DATETIMEOFFSET(6)            NOT NULL CONSTRAINT DF_post_fecha DEFAULT SYSUTCDATETIME(),
@@ -114,14 +97,14 @@ BEGIN
         CONSTRAINT PK_postulaciones     PRIMARY KEY (id),
         CONSTRAINT FK_post_convocatoria FOREIGN KEY (convocatoria_id)
             REFERENCES dbo.convocatorias (id),
-        CONSTRAINT FK_post_estudiante   FOREIGN KEY (estudiante_id)
+        CONSTRAINT FK_post_postulante   FOREIGN KEY (postulante_id)
             REFERENCES dbo.usuarios (id),
         CONSTRAINT CK_post_estado       CHECK (estado IN ('PENDIENTE', 'APROBADA', 'RECHAZADA')),
-        -- Un estudiante no puede postularse dos veces a la misma convocatoria
-        CONSTRAINT UQ_post_unica        UNIQUE (convocatoria_id, estudiante_id)
+        -- Un postulante no puede postularse dos veces a la misma convocatoria
+        CONSTRAINT UQ_post_unica        UNIQUE (convocatoria_id, postulante_id)
     );
     CREATE INDEX IX_post_convocatoria ON dbo.postulaciones (convocatoria_id);
-    CREATE INDEX IX_post_estudiante   ON dbo.postulaciones (estudiante_id);
+    CREATE INDEX IX_post_postulante   ON dbo.postulaciones (postulante_id);
     CREATE INDEX IX_post_estado       ON dbo.postulaciones (estado);
 END
 GO

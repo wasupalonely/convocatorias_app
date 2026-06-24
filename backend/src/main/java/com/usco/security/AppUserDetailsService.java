@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/** Loads a user by email and adapts it to Spring Security's user model. */
 @Service
 public class AppUserDetailsService implements UserDetailsService {
 

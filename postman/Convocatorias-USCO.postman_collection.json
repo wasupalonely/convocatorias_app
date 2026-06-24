@@ -1,0 +1,315 @@
+{
+  "info": {
+    "name": "Convocatorias USCO - API",
+    "description": "Coleccion para el Sistema de Gestion de Convocatorias Institucionales (Universidad Surcolombiana).\n\nUso:\n1. Ejecuta `Auth > Login` con las credenciales del administrador semilla. El access token y el refresh token se guardan automaticamente en las variables de coleccion `token` y `refreshToken`.\n2. El resto de peticiones heredan la autenticacion Bearer (access token).\n3. Cuando el access token expire (15 min), ejecuta `Auth > Refresh` para renovarlo sin volver a iniciar sesion.\n\nNota: los identificadores de la API estan en ingles (name, email, callId...). Los mensajes de error vienen en espanol.\n\nVariables:\n- baseUrl: URL del backend (por defecto http://localhost:8080)\n- token / refreshToken: se completan solos tras el login\n- userId / callId / categoryId / applicationId: ids de ejemplo, ajusta segun tus datos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "token", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "userId", "value": "1" },
+    { "key": "callId", "value": "1" },
+    { "key": "categoryId", "value": "1" },
+    { "key": "applicationId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('token', body.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', body.refreshToken);",
+                  "  pm.test('Access token recibido', () => pm.expect(body.accessToken).to.be.a('string'));",
+                  "} else {",
+                  "  pm.test('Login fallido', () => pm.expect(pm.response.code).to.eql(200));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@usco.edu.co\",\n  \"password\": \"Admin123*\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Refresh token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('token', body.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', body.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/refresh", "host": ["{{baseUrl}}"], "path": ["api", "auth", "refresh"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/usuarios", "host": ["{{baseUrl}}"], "path": ["api", "usuarios"] }
+          }
+        },
+        {
+          "name": "Obtener usuario",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/usuarios/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "usuarios", "{{userId}}"] }
+          }
+        },
+        {
+          "name": "Crear usuario (estudiante)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identification\": \"1075123456\",\n  \"name\": \"Laura Estudiante\",\n  \"email\": \"laura@usco.edu.co\",\n  \"password\": \"Estudiante123*\",\n  \"role\": \"ESTUDIANTE\",\n  \"status\": \"ACTIVO\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/usuarios", "host": ["{{baseUrl}}"], "path": ["api", "usuarios"] }
+          }
+        },
+        {
+          "name": "Crear usuario (docente)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identification\": \"7712345\",\n  \"name\": \"Carlos Docente\",\n  \"email\": \"carlos@usco.edu.co\",\n  \"password\": \"Docente123*\",\n  \"role\": \"DOCENTE\",\n  \"status\": \"ACTIVO\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/usuarios", "host": ["{{baseUrl}}"], "path": ["api", "usuarios"] }
+          }
+        },
+        {
+          "name": "Actualizar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Laura Estudiante Actualizada\",\n  \"email\": \"laura@usco.edu.co\",\n  \"role\": \"ESTUDIANTE\",\n  \"status\": \"ACTIVO\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/usuarios/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "usuarios", "{{userId}}"] }
+          }
+        },
+        {
+          "name": "Eliminar usuario",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/usuarios/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "usuarios", "{{userId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categorias",
+      "item": [
+        {
+          "name": "Listar categorias",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/categorias", "host": ["{{baseUrl}}"], "path": ["api", "categorias"] }
+          }
+        },
+        {
+          "name": "Crear categoria",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Emprendimiento\",\n  \"description\": \"Convocatorias de emprendimiento e innovacion\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/categorias", "host": ["{{baseUrl}}"], "path": ["api", "categorias"] }
+          }
+        },
+        {
+          "name": "Actualizar categoria",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Emprendimiento e Innovacion\",\n  \"description\": \"Actualizada\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/categorias/{{categoryId}}", "host": ["{{baseUrl}}"], "path": ["api", "categorias", "{{categoryId}}"] }
+          }
+        },
+        {
+          "name": "Eliminar categoria",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/categorias/{{categoryId}}", "host": ["{{baseUrl}}"], "path": ["api", "categorias", "{{categoryId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Convocatorias",
+      "item": [
+        {
+          "name": "Listar convocatorias",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/convocatorias", "host": ["{{baseUrl}}"], "path": ["api", "convocatorias"] }
+          }
+        },
+        {
+          "name": "Obtener convocatoria",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/convocatorias/{{callId}}", "host": ["{{baseUrl}}"], "path": ["api", "convocatorias", "{{callId}}"] }
+          }
+        },
+        {
+          "name": "Crear convocatoria (PUBLICADA con categorias)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Monitorias Academicas 2026\",\n  \"description\": \"Convocatoria para monitorias academicas del periodo 2026-1\",\n  \"startDate\": \"2026-07-01\",\n  \"endDate\": \"2026-07-31\",\n  \"availableSlots\": 10,\n  \"status\": \"PUBLICADA\",\n  \"categoryIds\": [1, 3]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/convocatorias", "host": ["{{baseUrl}}"], "path": ["api", "convocatorias"] }
+          }
+        },
+        {
+          "name": "Actualizar convocatoria",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Monitorias Academicas 2026 (actualizada)\",\n  \"description\": \"Cupos ampliados\",\n  \"startDate\": \"2026-07-01\",\n  \"endDate\": \"2026-08-15\",\n  \"availableSlots\": 15,\n  \"status\": \"PUBLICADA\",\n  \"categoryIds\": [1, 3]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/convocatorias/{{callId}}", "host": ["{{baseUrl}}"], "path": ["api", "convocatorias", "{{callId}}"] }
+          }
+        },
+        {
+          "name": "Eliminar convocatoria",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/convocatorias/{{callId}}", "host": ["{{baseUrl}}"], "path": ["api", "convocatorias", "{{callId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Postulaciones",
+      "item": [
+        {
+          "name": "Postular (ESTUDIANTE o DOCENTE)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"callId\": {{callId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/postulaciones", "host": ["{{baseUrl}}"], "path": ["api", "postulaciones"] }
+          }
+        },
+        {
+          "name": "Listar postulaciones (admin: todas / postulante: propias)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/postulaciones", "host": ["{{baseUrl}}"], "path": ["api", "postulaciones"] }
+          }
+        },
+        {
+          "name": "Aprobar postulacion (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APROBADA\",\n  \"observation\": \"Cumple requisitos\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/postulaciones/{{applicationId}}/estado", "host": ["{{baseUrl}}"], "path": ["api", "postulaciones", "{{applicationId}}", "estado"] }
+          }
+        },
+        {
+          "name": "Rechazar postulacion (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"RECHAZADA\",\n  \"observation\": \"No cumple promedio minimo\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/postulaciones/{{applicationId}}/estado", "host": ["{{baseUrl}}"], "path": ["api", "postulaciones", "{{applicationId}}", "estado"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reportes",
+      "item": [
+        {
+          "name": "Convocatorias por categoria",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/reportes/convocatorias-categoria", "host": ["{{baseUrl}}"], "path": ["api", "reportes", "convocatorias-categoria"] }
+          }
+        },
+        {
+          "name": "Postulaciones por convocatoria",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/reportes/postulaciones-convocatoria", "host": ["{{baseUrl}}"], "path": ["api", "reportes", "postulaciones-convocatoria"] }
+          }
+        },
+        {
+          "name": "Resultado de postulaciones (aprobadas/rechazadas)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/reportes/resultado-postulaciones", "host": ["{{baseUrl}}"], "path": ["api", "reportes", "resultado-postulaciones"] }
+          }
+        }
+      ]
+    }
+  ]
+}

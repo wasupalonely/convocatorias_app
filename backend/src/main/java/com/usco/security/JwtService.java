@@ -13,11 +13,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
 
-/**
- * Issues and validates JWTs signed with HMAC-SHA256.
- * Two token types are produced: a short-lived {@code access} token and a
- * long-lived {@code refresh} token, distinguished by the {@code type} claim.
- */
 @Service
 public class JwtService {
 
@@ -55,7 +50,6 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    /** Validates signature and expiry. Returns false instead of throwing for any malformed/expired token. */
     public boolean isTokenValid(String token) {
         try {
             return extractClaim(token, Claims::getExpiration).after(new Date());

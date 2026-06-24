@@ -82,7 +82,7 @@ public class SecurityConfig {
                                 "/api/categorias", "/api/categorias/**",
                                 "/api/convocatorias", "/api/convocatorias/**").hasRole(ADMIN)
 
-                        // Postulaciones: postula estudiante o docente; aprueba/rechaza solo admin; consultar, autenticado.
+                        // Postulaciones: postula estudiante o docente; aprueba/rechaza solo admin; consultar, autenticado
                         .requestMatchers(HttpMethod.POST, "/api/postulaciones").hasAnyRole(STUDENT, TEACHER)
                         .requestMatchers(HttpMethod.PUT, "/api/postulaciones/*/estado").hasRole(ADMIN)
                         .requestMatchers(HttpMethod.GET, "/api/postulaciones").authenticated()
@@ -137,7 +137,6 @@ public class SecurityConfig {
         try {
             response.getWriter().write(objectMapper.writeValueAsString(body));
         } catch (Exception ignored) {
-            // If writing the body fails, the status code has already been sent.
         }
     }
 }

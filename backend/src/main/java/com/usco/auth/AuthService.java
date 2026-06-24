@@ -13,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-/** Orchestrates authentication: validates credentials and issues access/refresh tokens. */
 @Service
 public class AuthService {
 
@@ -40,7 +39,6 @@ public class AuthService {
         return buildResponse(user);
     }
 
-    /** Issues a fresh pair of tokens from a valid refresh token (token rotation). */
     public AuthResponse refresh(RefreshRequest request) {
         String token = request.refreshToken();
         if (!jwtService.isTokenValid(token) || !jwtService.isRefreshToken(token)) {

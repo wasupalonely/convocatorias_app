@@ -8,7 +8,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-/** Resolves the {@link User} entity associated with the JWT of the current request. */
 @Component
 public class CurrentUserProvider {
 

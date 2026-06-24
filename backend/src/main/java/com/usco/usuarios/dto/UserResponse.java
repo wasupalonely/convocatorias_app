@@ -6,7 +6,6 @@ import com.usco.usuarios.domain.UserStatus;
 
 import java.time.Instant;
 
-/** Output representation of a user (never exposes the password hash). */
 public record UserResponse(
         Long id,
         String identification,
