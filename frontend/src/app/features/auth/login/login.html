@@ -1,0 +1,83 @@
+<div class="login">
+  <section class="login__brand" aria-hidden="true">
+    <div class="login__brand-inner">
+      <app-brand-mark [size]="56" tone="on-brand" />
+      <p class="login__eyebrow">Universidad Surcolombiana</p>
+      <h1 class="login__brand-title">Sistema de Gestión de Convocatorias Institucionales</h1>
+      <p class="login__brand-note">
+        Convocatorias para becas, monitorías, proyectos y actividades de la comunidad universitaria.
+      </p>
+    </div>
+  </section>
+
+  <main class="login__panel">
+    <div class="login__card">
+      <header class="login__header">
+        <h2 class="login__title">Iniciar sesión</h2>
+        <p class="login__subtitle">Ingresa con tu correo institucional.</p>
+      </header>
+
+      @if (loading()) {
+        <mat-progress-bar mode="indeterminate" aria-label="Iniciando sesión" />
+      }
+
+      @if (errorMessage(); as message) {
+        <p class="login__error" role="alert">
+          <mat-icon aria-hidden="true">error_outline</mat-icon>
+          <span>{{ message }}</span>
+        </p>
+      }
+
+      <form class="login__form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>Correo</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            autocomplete="username"
+            placeholder="usuario@usco.edu.co"
+          />
+          <mat-icon matPrefix aria-hidden="true">mail_outline</mat-icon>
+          @if (form.controls.email.hasError('required')) {
+            <mat-error>El correo es obligatorio.</mat-error>
+          } @else if (form.controls.email.hasError('email')) {
+            <mat-error>El correo no tiene un formato válido.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Contraseña</mat-label>
+          <input
+            matInput
+            [type]="passwordHidden() ? 'password' : 'text'"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+          <mat-icon matPrefix aria-hidden="true">lock_outline</mat-icon>
+          <button
+            type="button"
+            mat-icon-button
+            matSuffix
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="passwordHidden() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
+            [attr.aria-pressed]="!passwordHidden()"
+          >
+            <mat-icon aria-hidden="true">{{ passwordHidden() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          @if (form.controls.password.hasError('required')) {
+            <mat-error>La contraseña es obligatoria.</mat-error>
+          } @else if (form.controls.password.hasError('minlength')) {
+            <mat-error>La contraseña debe tener al menos 6 caracteres.</mat-error>
+          }
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" type="submit" class="login__submit" [disabled]="loading()">
+          Iniciar sesión
+        </button>
+      </form>
+    </div>
+
+    <p class="login__footer">Universidad Surcolombiana · Neiva — Huila</p>
+  </main>
+</div>

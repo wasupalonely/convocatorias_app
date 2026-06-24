@@ -1,0 +1,14 @@
+.create-dialog__form {
+  padding-top: 8px;
+  min-inline-size: min(420px, 80vw);
+}
+
+.create-dialog__form mat-form-field {
+  inline-size: 100%;
+}
+
+.create-dialog__hint {
+  margin: 8px 0;
+  color: var(--mat-sys-on-surface-variant);
+  min-inline-size: min(420px, 80vw);
+}

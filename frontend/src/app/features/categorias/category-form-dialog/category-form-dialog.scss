@@ -1,0 +1,11 @@
+.category-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  min-inline-size: min(440px, 80vw);
+}
+
+.category-form mat-form-field {
+  inline-size: 100%;
+}

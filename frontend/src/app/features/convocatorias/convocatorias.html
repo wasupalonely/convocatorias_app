@@ -1,0 +1,169 @@
+<header class="page-head">
+  <div>
+    <h1 class="page-head__title">Convocatorias</h1>
+    <p class="page-head__subtitle">
+      @if (isAdmin()) {
+        Crea, publica y administra las convocatorias institucionales.
+      } @else {
+        Explora las convocatorias disponibles y postúlate.
+      }
+    </p>
+  </div>
+  @if (isAdmin()) {
+    <button mat-flat-button color="primary" (click)="openCreate()">
+      <mat-icon aria-hidden="true">add</mat-icon>
+      Nueva convocatoria
+    </button>
+  }
+</header>
+
+@if (activeCategoryName(); as categoryName) {
+  <div class="convocatorias__active-filter">
+    <mat-icon aria-hidden="true">filter_alt</mat-icon>
+    <span>Mostrando convocatorias de la categoría <strong>{{ categoryName }}</strong></span>
+    <button mat-button (click)="clearCategoryFilter()">Quitar filtro</button>
+  </div>
+}
+
+<div class="panel">
+  <div class="panel__toolbar convocatorias__filters" [formGroup]="dateForm">
+    <mat-form-field appearance="outline" class="panel__search" subscriptSizing="dynamic">
+      <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+      <mat-label>Buscar</mat-label>
+      <input matInput (keyup)="setSearch($any($event.target).value)" placeholder="Nombre o descripción…" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="convocatorias__category">
+      <mat-label>Categoría</mat-label>
+      <mat-select [value]="categoryFilter()" (selectionChange)="setCategoryFilter($event.value)">
+        <mat-option value="TODAS">Todas las categorías</mat-option>
+        @for (category of categories(); track category.id) {
+          <mat-option [value]="category.id">{{ category.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="convocatorias__date">
+      <mat-label>Vigente desde</mat-label>
+      <input matInput [matDatepicker]="fromPicker" formControlName="from" />
+      <mat-datepicker-toggle matIconSuffix [for]="fromPicker" />
+      <mat-datepicker #fromPicker />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="convocatorias__date">
+      <mat-label>Vigente hasta</mat-label>
+      <input matInput [matDatepicker]="toPicker" formControlName="to" />
+      <mat-datepicker-toggle matIconSuffix [for]="toPicker" />
+      <mat-datepicker #toPicker />
+    </mat-form-field>
+
+    <button mat-button type="button" (click)="clearFilters()">
+      <mat-icon aria-hidden="true">filter_alt_off</mat-icon>
+      Limpiar
+    </button>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Cargando convocatorias" />
+  }
+
+  @if (loadError()) {
+    <div class="panel__state" role="alert">
+      <mat-icon aria-hidden="true">cloud_off</mat-icon>
+      <p>No se pudieron cargar las convocatorias.</p>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="dataSource" matSort>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
+          <td mat-cell *matCellDef="let call">{{ call.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
+          <td mat-cell *matCellDef="let call">
+            <app-status-chip [label]="statusLabel(call.status)" [tone]="statusTone(call.status)" />
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dates">
+          <th mat-header-cell *matHeaderCellDef>Vigencia</th>
+          <td mat-cell *matCellDef="let call" class="cell-muted">
+            {{ call.startDate | date: 'dd/MM/yyyy' }} – {{ call.endDate | date: 'dd/MM/yyyy' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="availableSlots">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Cupos</th>
+          <td mat-cell *matCellDef="let call" [matTooltip]="'Aprobadas / cupos totales'">
+            {{ call.approvedCount }} / {{ call.availableSlots }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="categories">
+          <th mat-header-cell *matHeaderCellDef>Categorías</th>
+          <td mat-cell *matCellDef="let call">
+            @if (call.categories.length) {
+              <span class="call-categories">
+                @for (category of call.categories; track category.id) {
+                  <app-status-chip [label]="category.name" tone="brand" />
+                }
+              </span>
+            } @else {
+              <span class="cell-muted">—</span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="apply">
+          <th mat-header-cell *matHeaderCellDef class="col-actions">Postulación</th>
+          <td mat-cell *matCellDef="let call" class="col-actions">
+            @if (myApplicationStatus(call); as appStatus) {
+              <app-status-chip
+                [label]="applicationStatusLabel(appStatus)"
+                [tone]="applicationStatusTone(appStatus)"
+              />
+            } @else if (canApplyTo(call)) {
+              <button mat-stroked-button color="primary" (click)="apply(call)">
+                <mat-icon aria-hidden="true">how_to_reg</mat-icon>
+                Postularme
+              </button>
+            } @else {
+              <span
+                class="cell-muted"
+                [matTooltip]="slotsAreFull(call) ? 'Cupos ya asignados' : 'No disponible para postulación'"
+              >
+                No disponible
+              </span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="col-actions">Acciones</th>
+          <td mat-cell *matCellDef="let call" class="col-actions">
+            <button mat-icon-button (click)="openEdit(call)" matTooltip="Editar" aria-label="Editar convocatoria">
+              <mat-icon aria-hidden="true">edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="confirmDelete(call)" matTooltip="Eliminar" aria-label="Eliminar convocatoria">
+              <mat-icon aria-hidden="true">delete_outline</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
+      </table>
+
+      @if (!loading() && dataSource.data.length === 0) {
+        <div class="panel__state">
+          <mat-icon aria-hidden="true">campaign</mat-icon>
+          <p>No hay convocatorias para mostrar.</p>
+        </div>
+      }
+    </div>
+
+    <mat-paginator [pageSizeOptions]="[10, 25, 50]" [pageSize]="10" showFirstLastButtons />
+  }
+</div>

@@ -1,0 +1,16 @@
+.postulaciones__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.postulaciones__status-filter {
+  inline-size: 200px;
+}
+
+.postulaciones__applicant {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}

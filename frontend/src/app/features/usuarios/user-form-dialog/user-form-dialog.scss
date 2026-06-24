@@ -1,0 +1,23 @@
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  min-inline-size: min(440px, 80vw);
+}
+
+.user-form mat-form-field {
+  inline-size: 100%;
+}
+
+.user-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 540px) {
+  .user-form__row {
+    grid-template-columns: 1fr;
+  }
+}

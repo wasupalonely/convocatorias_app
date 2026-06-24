@@ -292,21 +292,21 @@
           "name": "Convocatorias por categoria",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{baseUrl}}/api/reportes/convocatorias-categoria", "host": ["{{baseUrl}}"], "path": ["api", "reportes", "convocatorias-categoria"] }
+            "url": { "raw": "{{baseUrl}}/api/reportes/convocatorias-categoria", "host": ["{{baseUrl}}"], "path": ["api", "reportes", "convocatorias-categoria"], "query": [{ "key": "from", "value": "2026-07-01", "description": "Opcional (yyyy-MM-dd): filtra por vigencia que cruce el rango.", "disabled": true }, { "key": "to", "value": "2026-12-31", "description": "Opcional (yyyy-MM-dd).", "disabled": true }] }
           }
         },
         {
           "name": "Postulaciones por convocatoria",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{baseUrl}}/api/reportes/postulaciones-convocatoria", "host": ["{{baseUrl}}"], "path": ["api", "reportes", "postulaciones-convocatoria"] }
+            "url": { "raw": "{{baseUrl}}/api/reportes/postulaciones-convocatoria", "host": ["{{baseUrl}}"], "path": ["api", "reportes", "postulaciones-convocatoria"], "query": [{ "key": "from", "value": "2026-06-01", "description": "Opcional (yyyy-MM-dd): filtra por fecha de postulación.", "disabled": true }, { "key": "to", "value": "2026-06-30", "description": "Opcional (yyyy-MM-dd).", "disabled": true }] }
           }
         },
         {
           "name": "Resultado de postulaciones (aprobadas/rechazadas)",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{baseUrl}}/api/reportes/resultado-postulaciones", "host": ["{{baseUrl}}"], "path": ["api", "reportes", "resultado-postulaciones"] }
+            "url": { "raw": "{{baseUrl}}/api/reportes/resultado-postulaciones", "host": ["{{baseUrl}}"], "path": ["api", "reportes", "resultado-postulaciones"], "query": [{ "key": "from", "value": "2026-06-01", "description": "Opcional (yyyy-MM-dd): filtra por fecha de postulación.", "disabled": true }, { "key": "to", "value": "2026-06-30", "description": "Opcional (yyyy-MM-dd).", "disabled": true }] }
           }
         }
       ]

@@ -1,0 +1,26 @@
+.status-dialog__meta {
+  margin: 0 0 12px;
+  display: grid;
+  gap: 10px;
+  min-inline-size: min(440px, 80vw);
+}
+
+.status-dialog__meta div {
+  display: grid;
+  gap: 2px;
+}
+
+.status-dialog__meta dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.status-dialog__meta dd {
+  margin: 0;
+}
+
+.status-dialog__form mat-form-field {
+  inline-size: 100%;
+}

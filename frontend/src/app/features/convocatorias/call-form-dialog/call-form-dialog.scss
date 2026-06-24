@@ -1,0 +1,29 @@
+.call-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  min-inline-size: min(520px, 82vw);
+}
+
+.call-form mat-form-field {
+  inline-size: 100%;
+}
+
+.call-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.call-form__form-error {
+  margin: 0 0 8px;
+  color: var(--app-status-rejected);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 560px) {
+  .call-form__row {
+    grid-template-columns: 1fr;
+  }
+}

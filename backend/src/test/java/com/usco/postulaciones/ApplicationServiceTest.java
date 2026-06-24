@@ -64,7 +64,7 @@ class ApplicationServiceTest {
         when(currentUserProvider.getCurrentUser()).thenReturn(applicant);
         when(callService.getEntity(anyLong())).thenReturn(call);
         when(applicationRepository.existsByCallIdAndApplicantId(any(), any())).thenReturn(false);
-        when(applicationRepository.countByCallIdAndStatusNot(any(), any())).thenReturn(0L);
+        when(applicationRepository.countByCallIdAndStatus(any(), any())).thenReturn(0L);
         when(applicationRepository.save(any(Application.class))).thenAnswer(inv -> inv.getArgument(0));
 
         var response = applicationService.apply(new ApplicationRequest(1L));
@@ -95,11 +95,12 @@ class ApplicationServiceTest {
     }
 
     @Test
-    void apply_failsWhenNoSlotsAvailable() {
+    void apply_failsWhenApprovedSlotsAreFull() {
         when(currentUserProvider.getCurrentUser()).thenReturn(applicant);
         when(callService.getEntity(anyLong())).thenReturn(call);
         when(applicationRepository.existsByCallIdAndApplicantId(any(), any())).thenReturn(false);
-        when(applicationRepository.countByCallIdAndStatusNot(any(), any())).thenReturn(2L);
+        // Los cupos ya fueron asignados (aprobadas == availableSlots): no se admiten mas postulaciones.
+        when(applicationRepository.countByCallIdAndStatus(any(), any())).thenReturn(2L);
 
         assertThatThrownBy(() -> applicationService.apply(new ApplicationRequest(1L)))
                 .isInstanceOf(BusinessException.class)

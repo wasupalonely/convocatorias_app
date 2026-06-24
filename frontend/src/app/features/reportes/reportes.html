@@ -1,0 +1,73 @@
+<header class="page-head">
+  <div>
+    <h1 class="page-head__title">Reportes</h1>
+    <p class="page-head__subtitle">Indicadores del sistema en tabla y gráfico. Exportables a Excel y PDF.</p>
+  </div>
+</header>
+
+<form class="reportes__filter" [formGroup]="rangeForm" (ngSubmit)="applyRange()">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Desde</mat-label>
+    <input matInput [matDatepicker]="fromPicker" formControlName="from" />
+    <mat-datepicker-toggle matIconSuffix [for]="fromPicker" />
+    <mat-datepicker #fromPicker />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Hasta</mat-label>
+    <input matInput [matDatepicker]="toPicker" formControlName="to" />
+    <mat-datepicker-toggle matIconSuffix [for]="toPicker" />
+    <mat-datepicker #toPicker />
+  </mat-form-field>
+
+  <button mat-flat-button color="primary" type="submit">
+    <mat-icon aria-hidden="true">filter_alt</mat-icon>
+    Aplicar
+  </button>
+  <button mat-button type="button" (click)="clearRange()">Limpiar</button>
+
+  <p class="reportes__filter-hint">
+    Filtra postulaciones por fecha de postulación y convocatorias por vigencia en el rango.
+  </p>
+</form>
+
+<div class="panel reportes__panel">
+  <mat-tab-group>
+    <mat-tab label="Convocatorias por categoría">
+      <app-report-section
+        title="Convocatorias por categoría"
+        description="Número de convocatorias asociadas a cada categoría."
+        labelHeader="Categoría"
+        filenameBase="convocatorias-por-categoria"
+        [items]="callsByCategory.items()"
+        [loading]="callsByCategory.loading()"
+        [error]="callsByCategory.error()"
+      />
+    </mat-tab>
+
+    <mat-tab label="Postulaciones por convocatoria">
+      <app-report-section
+        title="Postulaciones por convocatoria"
+        description="Cantidad de postulaciones recibidas por cada convocatoria."
+        labelHeader="Convocatoria"
+        filenameBase="postulaciones-por-convocatoria"
+        [items]="applicationsByCall.items()"
+        [loading]="applicationsByCall.loading()"
+        [error]="applicationsByCall.error()"
+      />
+    </mat-tab>
+
+    <mat-tab label="Resultado de postulaciones">
+      <app-report-section
+        title="Resultado de postulaciones"
+        description="Distribución de postulaciones por estado."
+        labelHeader="Estado"
+        filenameBase="resultado-postulaciones"
+        chartType="doughnut"
+        [items]="applicationsByResult.items()"
+        [loading]="applicationsByResult.loading()"
+        [error]="applicationsByResult.error()"
+      />
+    </mat-tab>
+  </mat-tab-group>
+</div>

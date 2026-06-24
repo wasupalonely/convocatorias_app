@@ -1,39 +1,144 @@
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+@use './theme-colors' as theme;
 
 html {
   height: 100%;
   @include mat.theme(
     (
       color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
+        primary: theme.$primary-palette,
+        tertiary: theme.$tertiary-palette,
       ),
-      typography: Roboto,
+      typography: (
+        plain-family: 'Inter',
+        brand-family: 'Source Serif 4',
+        bold-weight: 600,
+        medium-weight: 500,
+        regular-weight: 400,
+      ),
       density: 0,
     )
   );
+
+  // Tokens de aplicacion (acento institucional + estados). El vinotinto se usa
+  // como acento; las superficies se mantienen claras y neutras.
+  --app-brand: #87241d;
+  --app-brand-strong: #6e1d17;
+  --app-brand-tint: #{rgba(#87241d, 0.08)};
+
+  --app-status-pending: #9a6700;
+  --app-status-approved: #2e7d32;
+  --app-status-rejected: #c62828;
+  --app-status-draft: #6a5b59;
+  --app-status-published: #2e7d32;
+  --app-status-closed: #6e1d17;
+
+  --app-page-max: 1180px;
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
   color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
+  background-color: var(--mat-sys-surface-container-low);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
   margin: 0;
   height: 100%;
 }
-/* You can add global styles to this file, and also import other style files */
+
+* {
+  box-sizing: border-box;
+}
+
+// Encabezados de pagina/seccion en la familia de marca (serif).
+h1, h2, h3 {
+  font-family: 'Source Serif 4', Georgia, serif;
+  color: var(--mat-sys-on-surface);
+}
+
+// Primitivas de pagina reutilizadas por los modulos (globales, no scoped por componente).
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.page-head__title {
+  margin: 0 0 4px;
+  font-size: 1.8rem;
+}
+.page-head__subtitle {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.panel {
+  background: var(--mat-sys-surface);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.panel__toolbar {
+  padding: 16px 16px 0;
+}
+.panel__search {
+  inline-size: min(360px, 100%);
+}
+.panel__state {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--mat-sys-on-surface-variant);
+}
+.panel__state mat-icon {
+  inline-size: 40px;
+  block-size: 40px;
+  font-size: 40px;
+  color: var(--mat-sys-outline);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+table.mat-mdc-table {
+  inline-size: 100%;
+  background: transparent;
+}
+.col-actions {
+  text-align: right;
+  white-space: nowrap;
+  width: 1%;
+}
+.cell-muted {
+  color: var(--mat-sys-on-surface-variant);
+}
+.mat-mdc-row:hover {
+  background: color-mix(in srgb, var(--mat-sys-on-surface) 4%, transparent);
+}
+
+// Snackbars por tipo (la clase aplica al overlay, fuera del scope del componente).
+.app-snack-success {
+  --mdc-snackbar-container-color: #2e7d32;
+  --mdc-snackbar-supporting-text-color: #fff;
+  --mat-snack-bar-button-color: #fff;
+}
+.app-snack-error {
+  --mdc-snackbar-container-color: #b3261e;
+  --mdc-snackbar-supporting-text-color: #fff;
+  --mat-snack-bar-button-color: #fff;
+}
+.app-snack-info {
+  --mdc-snackbar-container-color: #2f2522;
+  --mdc-snackbar-supporting-text-color: #fff;
+  --mat-snack-bar-button-color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

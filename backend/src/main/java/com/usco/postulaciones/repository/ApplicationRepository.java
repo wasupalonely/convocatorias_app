@@ -12,8 +12,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     boolean existsByCallIdAndApplicantId(Long callId, Long applicantId);
 
-    long countByCallIdAndStatusNot(Long callId, ApplicationStatus status);
-
     long countByCallIdAndStatus(Long callId, ApplicationStatus status);
 
     @EntityGraph(attributePaths = {"call", "applicant"})

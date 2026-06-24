@@ -1,0 +1,42 @@
+<h2 mat-dialog-title>Nueva postulación</h2>
+
+@if (saving()) {
+  <mat-progress-bar mode="indeterminate" aria-label="Registrando postulación" />
+}
+
+<mat-dialog-content>
+  @if (loadingCalls()) {
+    <p class="create-dialog__hint">Cargando convocatorias…</p>
+  } @else if (availableCalls().length === 0) {
+    <p class="create-dialog__hint">
+      No hay convocatorias publicadas disponibles para postularte en este momento.
+    </p>
+  } @else {
+    <form id="application-form" class="create-dialog__form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <mat-form-field appearance="outline">
+        <mat-label>Convocatoria</mat-label>
+        <mat-select formControlName="callId">
+          @for (call of availableCalls(); track call.id) {
+            <mat-option [value]="call.id">{{ call.name }} · {{ call.availableSlots }} cupos</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.callId.hasError('required')) {
+          <mat-error>Selecciona una convocatoria.</mat-error>
+        }
+      </mat-form-field>
+    </form>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="saving()">Cancelar</button>
+  <button
+    mat-flat-button
+    color="primary"
+    type="submit"
+    form="application-form"
+    [disabled]="saving() || loadingCalls() || availableCalls().length === 0"
+  >
+    Postularme
+  </button>
+</mat-dialog-actions>

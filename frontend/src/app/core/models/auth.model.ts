@@ -19,3 +19,5 @@ export interface AuthResponse {
   email: string;
   role: Role;
 }
+
+export type SessionUser = Pick<AuthResponse, 'userId' | 'name' | 'email' | 'role'>;

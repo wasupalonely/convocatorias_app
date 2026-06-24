@@ -1,0 +1,95 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar convocatoria' : 'Nueva convocatoria' }}</h2>
+
+@if (saving()) {
+  <mat-progress-bar mode="indeterminate" aria-label="Guardando" />
+}
+
+<mat-dialog-content>
+  <form id="call-form" class="call-form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" autocomplete="off" />
+      @if (form.controls.name.hasError('required')) {
+        <mat-error>El nombre es obligatorio.</mat-error>
+      } @else if (form.controls.name.hasError('maxlength')) {
+        <mat-error>Máximo 150 caracteres.</mat-error>
+      } @else if (form.controls.name.hasError('server')) {
+        <mat-error>{{ form.controls.name.getError('server') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Descripción (opcional)</mat-label>
+      <textarea matInput formControlName="description" rows="3"></textarea>
+      @if (form.controls.description.hasError('maxlength')) {
+        <mat-error>Máximo 500 caracteres.</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="call-form__row">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha inicio</mat-label>
+        <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="startPicker" />
+        <mat-datepicker #startPicker />
+        @if (form.controls.startDate.hasError('required')) {
+          <mat-error>La fecha de inicio es obligatoria.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha fin</mat-label>
+        <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="endPicker" />
+        <mat-datepicker #endPicker />
+        @if (form.controls.endDate.hasError('required')) {
+          <mat-error>La fecha de fin es obligatoria.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    @if (form.hasError('dateRange') && form.controls.endDate.touched) {
+      <p class="call-form__form-error" role="alert">La fecha de fin debe ser igual o posterior a la de inicio.</p>
+    }
+
+    <div class="call-form__row">
+      <mat-form-field appearance="outline">
+        <mat-label>Cupos disponibles</mat-label>
+        <input matInput type="number" min="0" formControlName="availableSlots" />
+        @if (form.controls.availableSlots.hasError('required')) {
+          <mat-error>Los cupos son obligatorios.</mat-error>
+        } @else if (form.controls.availableSlots.hasError('min')) {
+          <mat-error>No puede ser negativo.</mat-error>
+        } @else if (form.controls.availableSlots.hasError('server')) {
+          <mat-error>{{ form.controls.availableSlots.getError('server') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="status">
+          @for (option of statusOptions; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Categorías</mat-label>
+      <mat-select formControlName="categoryIds" multiple>
+        @for (category of categories(); track category.id) {
+          <mat-option [value]="category.id">{{ category.name }}</mat-option>
+        }
+      </mat-select>
+      <mat-hint>Una convocatoria puede pertenecer a varias categorías.</mat-hint>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="saving()">Cancelar</button>
+  <button mat-flat-button color="primary" type="submit" form="call-form" [disabled]="saving()">
+    {{ isEdit ? 'Guardar cambios' : 'Crear convocatoria' }}
+  </button>
+</mat-dialog-actions>

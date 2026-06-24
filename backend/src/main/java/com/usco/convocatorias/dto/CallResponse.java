@@ -15,10 +15,11 @@ public record CallResponse(
         LocalDate startDate,
         LocalDate endDate,
         int availableSlots,
+        int approvedCount,
         CallStatus status,
         List<CategoryResponse> categories
 ) {
-    public static CallResponse from(Call call) {
+    public static CallResponse from(Call call, long approvedCount) {
         List<CategoryResponse> categories = call.getCategories().stream()
                 .map(CategoryResponse::from)
                 .sorted(Comparator.comparing(CategoryResponse::name))
@@ -30,6 +31,7 @@ public record CallResponse(
                 call.getStartDate(),
                 call.getEndDate(),
                 call.getAvailableSlots(),
+                (int) approvedCount,
                 call.getStatus(),
                 categories);
     }

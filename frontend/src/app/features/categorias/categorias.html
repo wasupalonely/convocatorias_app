@@ -1,0 +1,82 @@
+<header class="page-head">
+  <div>
+    <h1 class="page-head__title">Categorías</h1>
+    <p class="page-head__subtitle">Áreas temáticas que clasifican las convocatorias.</p>
+  </div>
+  @if (isAdmin()) {
+    <button mat-flat-button color="primary" (click)="openCreate()">
+      <mat-icon aria-hidden="true">add</mat-icon>
+      Nueva categoría
+    </button>
+  }
+</header>
+
+<div class="panel">
+  <div class="panel__toolbar">
+    <mat-form-field appearance="outline" class="panel__search" subscriptSizing="dynamic">
+      <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+      <mat-label>Buscar</mat-label>
+      <input matInput (keyup)="applyFilter($any($event.target).value)" placeholder="Nombre o descripción…" />
+    </mat-form-field>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Cargando categorías" />
+  }
+
+  @if (loadError()) {
+    <div class="panel__state" role="alert">
+      <mat-icon aria-hidden="true">cloud_off</mat-icon>
+      <p>No se pudieron cargar las categorías.</p>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="dataSource" matSort>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
+          <td mat-cell *matCellDef="let category">
+            <a
+              class="category-link"
+              [routerLink]="['/convocatorias']"
+              [queryParams]="{ categoria: category.id }"
+              [matTooltip]="'Ver convocatorias de ' + category.name"
+            >
+              {{ category.name }}
+            </a>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>Descripción</th>
+          <td mat-cell *matCellDef="let category" class="cell-muted">
+            {{ category.description || '—' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="col-actions">Acciones</th>
+          <td mat-cell *matCellDef="let category" class="col-actions">
+            <button mat-icon-button (click)="openEdit(category)" matTooltip="Editar" aria-label="Editar categoría">
+              <mat-icon aria-hidden="true">edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="confirmDelete(category)" matTooltip="Eliminar" aria-label="Eliminar categoría">
+              <mat-icon aria-hidden="true">delete_outline</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
+      </table>
+
+      @if (!loading() && dataSource.data.length === 0) {
+        <div class="panel__state">
+          <mat-icon aria-hidden="true">sell</mat-icon>
+          <p>Aún no hay categorías.</p>
+        </div>
+      }
+    </div>
+
+    <mat-paginator [pageSizeOptions]="[10, 25, 50]" [pageSize]="10" showFirstLastButtons />
+  }
+</div>

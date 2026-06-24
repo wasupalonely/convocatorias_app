@@ -8,13 +8,16 @@ import com.usco.convocatorias.domain.Call;
 import com.usco.convocatorias.domain.CallStatus;
 import com.usco.convocatorias.dto.CallRequest;
 import com.usco.convocatorias.dto.CallResponse;
+import com.usco.convocatorias.dto.SlotCount;
 import com.usco.convocatorias.repository.CallRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -30,17 +33,18 @@ public class CallService {
 
     @Transactional(readOnly = true)
     public List<CallResponse> findAll() {
-        return callRepository.findAll().stream().map(CallResponse::from).toList();
+        return toResponses(callRepository.findAll());
     }
 
     @Transactional(readOnly = true)
     public List<CallResponse> findPublished() {
-        return callRepository.findByStatus(CallStatus.PUBLICADA).stream().map(CallResponse::from).toList();
+        return toResponses(callRepository.findByStatus(CallStatus.PUBLICADA));
     }
 
     @Transactional(readOnly = true)
     public CallResponse findById(Long id) {
-        return CallResponse.from(getOrThrow(id));
+        Call call = getOrThrow(id);
+        return CallResponse.from(call, callRepository.countApprovedApplications(id));
     }
 
     public CallResponse create(CallRequest request) {
@@ -50,7 +54,8 @@ public class CallService {
         if (request.status() != null) {
             call.setStatus(request.status());
         }
-        return CallResponse.from(callRepository.save(call));
+        // Recien creada: aun no tiene postulaciones aprobadas.
+        return CallResponse.from(callRepository.save(call), 0L);
     }
 
     public CallResponse update(Long id, CallRequest request) {
@@ -60,7 +65,16 @@ public class CallService {
         if (request.status() != null) {
             call.setStatus(request.status());
         }
-        return CallResponse.from(call);
+        return CallResponse.from(call, callRepository.countApprovedApplications(id));
+    }
+
+    // Mapea convocatorias a respuestas resolviendo el conteo de aprobadas en una sola consulta.
+    private List<CallResponse> toResponses(List<Call> calls) {
+        Map<Long, Long> approvedByCall = callRepository.countApprovedGroupedByCall().stream()
+                .collect(Collectors.toMap(SlotCount::getCallId, SlotCount::getTotal));
+        return calls.stream()
+                .map(call -> CallResponse.from(call, approvedByCall.getOrDefault(call.getId(), 0L)))
+                .toList();
     }
 
     public void delete(Long id) {

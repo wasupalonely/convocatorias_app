@@ -1,0 +1,90 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  block-size: 100dvh;
+}
+
+.shell__toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: 8px;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  border-bottom: 3px solid var(--app-brand);
+}
+
+.shell__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.shell__brand-text {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+}
+
+.shell__spacer {
+  flex: 1 1 auto;
+}
+
+.shell__user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+  margin-inline-end: 4px;
+}
+
+.shell__user-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.shell__user-role {
+  font-size: 0.75rem;
+  color: var(--app-brand);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.shell__container {
+  flex: 1 1 auto;
+  background: var(--mat-sys-surface-container-low);
+}
+
+.shell__sidenav {
+  inline-size: 256px;
+  border-inline-end: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface);
+  padding-top: 8px;
+}
+
+.shell__nav .shell__nav-item--active {
+  --mat-list-list-item-label-text-color: var(--app-brand);
+  --mat-list-list-item-leading-icon-color: var(--app-brand);
+  background: var(--app-brand-tint);
+  box-shadow: inset 3px 0 0 var(--app-brand);
+  font-weight: 600;
+}
+
+.shell__content {
+  max-inline-size: var(--app-page-max);
+  margin-inline: auto;
+  padding: 28px 24px 48px;
+}
+
+@media (max-width: 599px) {
+  .shell__user-name {
+    display: none;
+  }
+
+  .shell__content {
+    padding: 20px 16px 40px;
+  }
+}

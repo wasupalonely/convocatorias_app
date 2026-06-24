@@ -1,0 +1,41 @@
+.convocatorias__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.convocatorias__active-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 8px 8px 14px;
+  border-radius: 10px;
+  background: var(--app-brand-tint);
+  color: var(--app-brand);
+  font-size: 0.9rem;
+}
+
+.convocatorias__active-filter mat-icon {
+  flex: none;
+}
+
+.convocatorias__active-filter span {
+  flex: 1 1 auto;
+}
+
+.convocatorias__category {
+  inline-size: 220px;
+}
+
+.convocatorias__date {
+  inline-size: 170px;
+}
+
+.call-categories {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-block: 6px;
+}

@@ -42,7 +42,7 @@ Variables configurables vía `.env` (ver `.env.example`): `DB_PASSWORD`, `JWT_SE
 | ADMINISTRADOR | `admin@usco.edu.co` | `Admin123*` |
 
 ## Probar la API
-El detalle de endpoints (rutas, cuerpos y respuestas) vive en Swagger y en la colección de Postman; no se duplica aquí.
+El detalle de endpoints (rutas, cuerpos y respuestas) vive en Swagger y en la colección de Postman
 - **Swagger UI:** `http://localhost:8080/swagger-ui.html`
 - **Postman:** importar `postman/Convocatorias-USCO.postman_collection.json` y ejecutar primero `Auth > Login` (guarda el token automáticamente; el resto de peticiones lo heredan).
 

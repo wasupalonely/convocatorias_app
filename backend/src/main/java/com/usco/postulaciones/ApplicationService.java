@@ -93,9 +93,11 @@ public class ApplicationService {
     }
 
     private void validateSlotsAvailable(Call call) {
-        long occupied = applicationRepository.countByCallIdAndStatusNot(call.getId(), ApplicationStatus.RECHAZADA);
-        if (occupied >= call.getAvailableSlots()) {
-            throw new BusinessException("No hay cupos disponibles en esta convocatoria");
+        // El cupo se consume al APROBAR, no al postularse: se permite postular mientras
+        // queden cupos por asignar. La seleccion final la decide el administrador.
+        long approved = applicationRepository.countByCallIdAndStatus(call.getId(), ApplicationStatus.APROBADA);
+        if (approved >= call.getAvailableSlots()) {
+            throw new BusinessException("Los cupos de esta convocatoria ya fueron asignados");
         }
     }
 

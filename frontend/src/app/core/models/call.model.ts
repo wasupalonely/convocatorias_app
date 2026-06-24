@@ -8,6 +8,7 @@ export interface Call {
   startDate: string; // yyyy-MM-dd
   endDate: string; // yyyy-MM-dd
   availableSlots: number;
+  approvedCount: number; // postulaciones ya aprobadas (cupos consumidos)
   status: CallStatus;
   categories: Category[];
 }

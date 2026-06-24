@@ -1,0 +1,15 @@
+.category-link {
+  color: var(--app-brand);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.category-link:hover {
+  text-decoration: underline;
+}
+
+.category-link:focus-visible {
+  outline: 2px solid var(--app-brand);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
