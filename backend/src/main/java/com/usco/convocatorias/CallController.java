@@ -23,7 +23,7 @@ import java.util.List;
 @RequestMapping("/api/convocatorias")
 public class CallController {
 
-    private static final String ROLE_STUDENT = "ROLE_ESTUDIANTE";
+    private static final String ROLE_ADMIN = "ROLE_ADMINISTRADOR";
 
     private final CallService callService;
 
@@ -33,7 +33,7 @@ public class CallController {
 
     @GetMapping
     public List<CallResponse> getAll(Authentication authentication) {
-        return isStudent(authentication) ? callService.findPublished() : callService.findAll();
+        return isNotAdmin(authentication) ? callService.findPublished() : callService.findAll();
     }
 
     @GetMapping("/{id}")
@@ -58,9 +58,9 @@ public class CallController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    private boolean isStudent(Authentication authentication) {
+    private boolean isNotAdmin(Authentication authentication) {
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch(ROLE_STUDENT::equals);
+                .noneMatch(ROLE_ADMIN::equals);
     }
 }
