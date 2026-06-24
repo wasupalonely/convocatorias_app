@@ -1,0 +1,17 @@
+# Dev server con hot reload para el frontend Angular.
+# No es un build de produccion: corre `ng serve` dentro del contenedor.
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Instala dependencias en una capa cacheable; el codigo se monta por bind mount.
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+EXPOSE 4200
+
+# --host 0.0.0.0 expone el dev server fuera del contenedor.
+# --poll fuerza file-watching por sondeo, fiable con bind mounts en Docker.
+CMD ["npm", "run", "start", "--", "--host", "0.0.0.0", "--poll", "2000"]

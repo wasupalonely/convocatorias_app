@@ -11,13 +11,14 @@ API REST para administrar convocatorias institucionales (becas, monitorías, pro
 ```
 .
 ├── backend/          # API REST (Spring Boot, monolito modular com.usco)
+├── frontend/         # SPA Angular (Material + ng2-charts, Reactive Forms, sin SSR)
 ├── db/scripts/       # Script SQL completo
 ├── postman/          # Colección Postman
 └── docker-compose.yml
 ```
 
 ## Requisitos
-- Docker y Docker Compose. No se necesita Java/Maven local: el backend se compila dentro de Docker.
+- Docker y Docker Compose. No se necesita Java/Maven ni Node/Angular local: backend y frontend se construyen dentro de Docker.
 
 ## Cómo levantar
 
@@ -25,10 +26,13 @@ API REST para administrar convocatorias institucionales (becas, monitorías, pro
 docker compose up -d --build
 ```
 
-Levanta tres servicios:
+Levanta cuatro servicios:
 1. **db** — SQL Server 2022.
 2. **db-init** — crea la base de datos `convocatorias_db` (contenedor de un solo uso).
 3. **backend** — API en `http://localhost:8080` (aplica migraciones Flyway y crea el admin semilla al arrancar).
+4. **frontend** — SPA Angular servida con `ng serve` (hot reload) en `http://localhost:4200`. Consume la API en `:8080` vía CORS.
+
+> El frontend usa un dev server con recarga en caliente: editar `frontend/src` se refleja en el navegador sin reconstruir la imagen.
 
 Variables configurables vía `.env` (ver `.env.example`): `DB_PASSWORD`, `JWT_SECRET`, `CORS_ALLOWED_ORIGINS`.
 
