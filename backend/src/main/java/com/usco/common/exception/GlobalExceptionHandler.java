@@ -16,6 +16,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.util.HashMap;
 import java.util.Map;
 
+/** Translates application-wide exceptions into consistent {@link ApiError} responses. */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -50,14 +51,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiError> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest req) {
-        String mensaje = "El parametro '" + ex.getName() + "' tiene un valor invalido";
-        return build(HttpStatus.BAD_REQUEST, mensaje, req, null);
+        return build(HttpStatus.BAD_REQUEST, "El parametro '" + ex.getName() + "' tiene un valor invalido", req, null);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiError> handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest req) {
-        return build(HttpStatus.CONFLICT,
-                "La operacion viola una restriccion de integridad de datos", req, null);
+        return build(HttpStatus.CONFLICT, "La operacion viola una restriccion de integridad de datos", req, null);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -72,13 +71,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGeneric(Exception ex, HttpServletRequest req) {
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, " Error interno inesperado", req, null);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno inesperado", req, null);
     }
 
     private ResponseEntity<ApiError> build(HttpStatus status, String message, HttpServletRequest req,
                                            Map<String, String> fields) {
-        ApiError body = ApiError.of(status.value(), status.getReasonPhrase(), message,
-                req.getRequestURI(), fields);
+        ApiError body = ApiError.of(status.value(), status.getReasonPhrase(), message, req.getRequestURI(), fields);
         return ResponseEntity.status(status).body(body);
     }
 }

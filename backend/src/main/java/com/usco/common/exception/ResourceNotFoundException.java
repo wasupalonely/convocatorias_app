@@ -1,12 +1,13 @@
 package com.usco.common.exception;
 
+/** Thrown when a requested entity does not exist. Maps to HTTP 404. */
 public class ResourceNotFoundException extends RuntimeException {
 
-    public ResourceNotFoundException(String mensaje) {
-        super(mensaje);
+    public ResourceNotFoundException(String message) {
+        super(message);
     }
 
-    public static ResourceNotFoundException of(String recurso, Object id) {
-        return new ResourceNotFoundException(recurso + " no encontrado(a) con id " + id);
+    public static ResourceNotFoundException of(String resource, Object id) {
+        return new ResourceNotFoundException(resource + " no encontrado(a) con id " + id);
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/** Extracts the JWT from the Authorization header and authenticates the request in the security context. */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -41,9 +42,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = header.substring(PREFIX.length());
-        if (jwtService.esValido(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
-            String correo = jwtService.extraerCorreo(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(correo);
+        // Only access tokens authenticate API calls; refresh tokens are accepted solely at /api/auth/refresh.
+        boolean usable = jwtService.isTokenValid(token) && !jwtService.isRefreshToken(token);
+        if (usable && SecurityContextHolder.getContext().getAuthentication() == null) {
+            String email = jwtService.extractUsername(token);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());

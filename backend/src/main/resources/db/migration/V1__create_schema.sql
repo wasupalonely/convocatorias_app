@@ -57,17 +57,17 @@ CREATE INDEX IX_conv_cat_categoria ON dbo.convocatoria_categoria (categoria_id);
 CREATE TABLE dbo.postulaciones (
     id                 BIGINT IDENTITY(1,1)    NOT NULL,
     convocatoria_id    BIGINT                  NOT NULL,
-    estudiante_id      BIGINT                  NOT NULL,
+    postulante_id      BIGINT                  NOT NULL,
     estado             VARCHAR(12)             NOT NULL CONSTRAINT DF_post_estado DEFAULT 'PENDIENTE',
     observacion        NVARCHAR(500)           NULL,
     fecha_postulacion  DATETIMEOFFSET(6)            NOT NULL CONSTRAINT DF_post_fecha DEFAULT SYSUTCDATETIME(),
     actualizado_en     DATETIMEOFFSET(6)            NULL,
     CONSTRAINT PK_postulaciones     PRIMARY KEY (id),
     CONSTRAINT FK_post_convocatoria FOREIGN KEY (convocatoria_id) REFERENCES dbo.convocatorias (id),
-    CONSTRAINT FK_post_estudiante   FOREIGN KEY (estudiante_id)   REFERENCES dbo.usuarios (id),
+    CONSTRAINT FK_post_postulante   FOREIGN KEY (postulante_id)   REFERENCES dbo.usuarios (id),
     CONSTRAINT CK_post_estado       CHECK (estado IN ('PENDIENTE', 'APROBADA', 'RECHAZADA')),
-    CONSTRAINT UQ_post_unica        UNIQUE (convocatoria_id, estudiante_id)
+    CONSTRAINT UQ_post_unica        UNIQUE (convocatoria_id, postulante_id)
 );
 CREATE INDEX IX_post_convocatoria ON dbo.postulaciones (convocatoria_id);
-CREATE INDEX IX_post_estudiante   ON dbo.postulaciones (estudiante_id);
+CREATE INDEX IX_post_postulante   ON dbo.postulaciones (postulante_id);
 CREATE INDEX IX_post_estado       ON dbo.postulaciones (estado);

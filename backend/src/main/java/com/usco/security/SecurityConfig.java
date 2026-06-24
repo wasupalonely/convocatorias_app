@@ -1,17 +1,18 @@
 package com.usco.security;
 
-import com.usco.common.exception.ApiError;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.usco.common.exception.ApiError;
+import com.usco.usuarios.domain.Role;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,11 +28,16 @@ import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-@EnableMethodSecurity
 public class SecurityConfig {
 
-    private static final String[] RUTAS_PUBLICAS = {
+    // Role names taken from the enum: a typo here fails at compile time, not at runtime.
+    private static final String ADMIN = Role.ADMINISTRADOR.name();
+    private static final String TEACHER = Role.DOCENTE.name();
+    private static final String STUDENT = Role.ESTUDIANTE.name();
+
+    private static final String[] PUBLIC_PATHS = {
             "/api/auth/login",
+            "/api/auth/refresh",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
@@ -60,13 +66,33 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(RUTAS_PUBLICAS).permitAll()
+                        .requestMatchers(PUBLIC_PATHS).permitAll()
+
+                        // Usuarios: gestion exclusiva del administrador.
+                        .requestMatchers("/api/usuarios", "/api/usuarios/**").hasRole(ADMIN)
+
+                        // Reportes: solo administrador.
+                        .requestMatchers("/api/reportes/**").hasRole(ADMIN)
+
+                        // Categorias y convocatorias: lectura para cualquier autenticado, escritura solo admin.
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/categorias", "/api/categorias/**",
+                                "/api/convocatorias", "/api/convocatorias/**").authenticated()
+                        .requestMatchers(
+                                "/api/categorias", "/api/categorias/**",
+                                "/api/convocatorias", "/api/convocatorias/**").hasRole(ADMIN)
+
+                        // Postulaciones: postula estudiante o docente; aprueba/rechaza solo admin; consultar, autenticado.
+                        .requestMatchers(HttpMethod.POST, "/api/postulaciones").hasAnyRole(STUDENT, TEACHER)
+                        .requestMatchers(HttpMethod.PUT, "/api/postulaciones/*/estado").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.GET, "/api/postulaciones").authenticated()
+
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((req, res, e) ->
-                                escribirError(res, HttpStatus.UNAUTHORIZED, "Token ausente o invalido", req.getRequestURI()))
+                                writeError(res, HttpStatus.UNAUTHORIZED, "Token ausente o invalido", req.getRequestURI()))
                         .accessDeniedHandler((req, res, e) ->
-                                escribirError(res, HttpStatus.FORBIDDEN, "No tiene permisos para esta accion", req.getRequestURI())))
+                                writeError(res, HttpStatus.FORBIDDEN, "No tiene permisos para esta accion", req.getRequestURI())))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -104,14 +130,14 @@ public class SecurityConfig {
         return source;
     }
 
-    private void escribirError(HttpServletResponse response, HttpStatus status, String mensaje, String path) {
+    private void writeError(HttpServletResponse response, HttpStatus status, String message, String path) {
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        ApiError body = ApiError.of(status.value(), status.getReasonPhrase(), mensaje, path, null);
+        ApiError body = ApiError.of(status.value(), status.getReasonPhrase(), message, path, null);
         try {
             response.getWriter().write(objectMapper.writeValueAsString(body));
         } catch (Exception ignored) {
-            // Si falla la escritura del cuerpo, el codigo de estado ya fue enviado.
+            // If writing the body fails, the status code has already been sent.
         }
     }
 }

@@ -3,6 +3,16 @@ package com.usco.common.exception;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
+/**
+ * Standard error response body for the API.
+ *
+ * @param timestamp moment of the error (UTC)
+ * @param status    HTTP status code
+ * @param error     short HTTP status description
+ * @param message   human-readable message for the client (Spanish)
+ * @param path      requested path
+ * @param fields    per-field validation errors (optional)
+ */
 public record ApiError(
         OffsetDateTime timestamp,
         int status,

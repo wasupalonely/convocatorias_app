@@ -80,6 +80,13 @@
             <version>2.6.0</version>
         </dependency>
 
+        <!-- Lombok: reduce el boilerplate de las entidades -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Pruebas -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
